@@ -1,4 +1,10 @@
 .claude/*
 CLAUDE.md
 credentials.csv
-*.md
+PLANO.md
+*.tfstate*
+.terraform/
+*tfvars
+.env
+*.tfvars.json
+*.env
