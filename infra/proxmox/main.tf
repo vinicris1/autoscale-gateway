@@ -1,3 +1,12 @@
+#token password to workers join the cluster
+resource "random_password" "k3s_token" {
+  length  = 48
+  special = false
+}
+locals {
+  # IP do CP sem o "/24", para os workers saberem onde está o server
+  cp_ip = split("/", one([for v in values(var.vms) : v.ip if v.role == "server"]))[0]
+}
 resource "proxmox_virtual_environment_file" "user_data" {
   for_each     = var.vms
   content_type = "snippets"
@@ -10,6 +19,10 @@ resource "proxmox_virtual_environment_file" "user_data" {
       hostname       = each.key
       username       = var.user
       ssh_public_key = var.ssh_public_key
+      role           = each.value.role
+      cp_ip          = local.cp_ip
+      k3s_token      = random_password.k3s_token.result
+      k3s_version    = var.k3s_version
     })
   }
 }

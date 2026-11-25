@@ -2,9 +2,10 @@ proxmox_endpoint = "https://proxmox.example.local:8006"
 gateway        = "192.168.1.1"
 ssh_public_key = "place_holder - create a public key and put here"
 dns_servers    = ["192.168.1.254"]
+k3s_version = "v1.37.2+k3s1"
 
 vms = {
-  k8s-cp-01 = { cores = 2, memory = 2048, disk = 20, ip = "192.168.1.200/24" }
-  k8s-wk-01 = { cores = 2, memory = 3072, disk = 25, ip = "192.168.1.201/24" }
-  k8s-wk-02 = { cores = 2, memory = 3072, disk = 25, ip = "192.168.1.202/24" }
+  k8s-cp-01 = { role = "server", cores = 2, memory = 2048, disk = 20, ip = "192.168.1.200/24" }
+  k8s-wk-01 = { role = "agent", cores = 2, memory = 3072, disk = 25, ip = "192.168.1.201/24" }
+  k8s-wk-02 = { role = "agent", cores = 2, memory = 3072, disk = 25, ip = "192.168.1.202/24" }
 }

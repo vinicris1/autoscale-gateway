@@ -8,3 +8,25 @@ users:
     ssh_authorized_keys:
       - ${ssh_public_key}
 package_update: true
+packages:
+  - curl
+
+write_files:
+  - path: /etc/rancher/k3s/config.yaml
+    permissions: "0600"
+    content: |
+      token: "${k3s_token}"
+%{ if role == "server" ~}
+      write-kubeconfig-mode: "0644"
+      tls-san:
+        - "${cp_ip}"
+      disable:
+        - traefik
+%{ else ~}
+      server: "https://${cp_ip}:6443"
+      node-label:
+        - "role=worker"
+%{ endif ~}
+
+runcmd:
+  - curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION="${k3s_version}" INSTALL_K3S_EXEC="${role}" sh -
