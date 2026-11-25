@@ -19,13 +19,22 @@ variable "ssh_public_key" {
 }
 
 variable "vms" {
-  description = "cluster vm configuration"
+  description = "VMs do cluster: nome => papel no k3s (server/agent), vCPUs, memória (MiB), disco (GB) e IP em CIDR"
   type = map(object({
     cores  = number
     memory = number
     disk   = number
+    role   = string
     ip     = string # CIDR, e.g. "192.168.1.51/24"
   }))
+  validation {
+    condition     = alltrue([for v in values(var.vms) : contains(["server", "agent"], v.role)])
+    error_message = "role precisa ser \"server\" ou \"agent\"."
+  }
+  validation {
+    condition     = length([for v in values(var.vms) : v if v.role == "server"]) == 1
+    error_message = "Precisa existir exatamente uma VM com role = \"server\"."
+  }
 }
 variable "gateway" {
   description = "default gateway for vms"
@@ -64,4 +73,8 @@ variable "disk_size" {
 variable "dns_servers" {
   description = "default dns server"
   type        = list(string)
+}
+variable "k3s_version" {
+  description = "Versão do k3s instalada nas VMs (ex.: v1.37). Mesma minor do EKS."
+  type        = string
 }
