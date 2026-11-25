@@ -9,13 +9,18 @@ O objetivo é demonstrar escala horizontal de pods (HPA/KEDA) e de nós (Karpent
 ## Arquitetura
 
 ```
-cliente / k6 ──► Traefik (rate limit por IP, escala por RPS)
+cliente / k6 ──► Traefik (rate limit por IP)
                      │
                      ▼
               API (encurtador de URL) ──► Redis
-              escala com KEDA (RPS / latência p95 via Prometheus)
                      │
               kube-prometheus-stack + Grafana
+
+Escala em dois níveis:
+  pods  ── KEDA lê RPS / p95 no Prometheus e muda as réplicas da API e do Traefik
+             │ pods novos sem espaço ficam Pending
+             ▼
+  nós   ── Karpenter cria ou remove EC2 spot conforme os pods Pending (só na AWS)
 ```
 
 | Ambiente | Onde | Cluster |
